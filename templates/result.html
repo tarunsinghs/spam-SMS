@@ -2,7 +2,7 @@
 <html>
 <head>
 	<title></title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" >
 </head>
 <body>
 
@@ -16,17 +16,58 @@
 	</div>
 	</header>
 	<p style="color:blue;font-size:20;text-align: center;"><b>Results for Comment</b></p>
-	<div class="results">
+	<center class="results">
+		<table>
+			<tr>
+				<th>Message</th>
+				<th>KNN</th>
+				<th>SVM</th>
+				<th>RANDOM FOREST</th>
+				<th>DECISION TREE</th>
+				<th>NAVY BAYAS</th>
+			</tr>
+			<tr>
+				<td>{{output['message']}}</td>
+				<td>
+					{% if output.knn == 1%}
+					<h2 style="color:red;">Spam</h2>
+					{% elif output.knn == 0%}
+					<h2 style="color:blue;">Not a Spam (It is a Ham)</h2>
+					{% endif %}
+				</td>
+				<td>
+					{% if output.svm == 1%}
+					<h2 style="color:red;">Spam</h2>
+					{% elif output.svm == 0%}
+					<h2 style="color:blue;">Not a Spam (It is a Ham)</h2>
+					{% endif %}
+				</td>
+				<td>
+					{% if output.rf == 1%}
+					<h2 style="color:red;">Spam</h2>
+					{% elif output.rf == 0%}
+					<h2 style="color:blue;">Not a Spam (It is a Ham)</h2>
+					{% endif %}
+				</td>
+				<td>
+					{% if output.dt == 1%}
+					<h2 style="color:red;">Spam</h2>
+					{% elif output.dt == 0%}
+					<h2 style="color:blue;">Not a Spam (It is a Ham)</h2>
+					{% endif %}
+				</td>
+				<td>
+					{% if output.nb == 1%}
+					<h2 style="color:red;">Spam</h2>
+					{% elif output.nb == 0%}
+					<h2 style="color:blue;">Not a Spam (It is a Ham)</h2>
+					{% endif %}
+				</td>
 
+			</tr>
+		</table>
 
-		
-	{% if prediction == 1%}
-	<h2 style="color:red;">Spam</h2>
-	{% elif prediction == 0%}
-	<h2 style="color:blue;">Not a Spam (It is a Ham)</h2>
-	{% endif %}
-
-	</div>
+	</center>
 
 </body>
 </html> 

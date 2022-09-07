@@ -9,6 +9,17 @@ body{
 	margin: auto;
 	overflow: hidden;
 }
+	
+table, th {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+td {
+	border: 1px solid black;
+	border-collapse: collapse;
+	padding: 20px;
+}
 
 header{
 	background:#03A9F4;#35434a;
@@ -47,10 +58,6 @@ header h2{
 .btn-info:hover {background: #0b7dda;}
 
 
-.resultss{
-	border-radius: 15px 50px;
-    background: #345fe4;
-    padding: 20px; 
-    width: 200px;
-    height: 150px;
-}
+.results{
+	border-radius: 15px 50px;	
+}	

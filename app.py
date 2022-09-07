@@ -1,12 +1,15 @@
-from flask import Flask, render_template, url_for, request
-import pandas as pd
 import pickle
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.naive_bayes import MultinomialNB
+import os
 import joblib
-
-from xgboost import XGBRegressor
-
+import pandas as pd
+from flask import Flask, render_template, request, url_for
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import MultinomialNB
+from sklearn import svm
+from xgboost import XGBClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 app = Flask(__name__)
 
@@ -19,7 +22,7 @@ def home():
 @app.route('/predict', methods=['POST'])
 def predict():
     df = pd.read_csv(
-        r"C:\Users\singh\OneDrive\Desktop\NLP-model-for-Spam-E-mail-classification-master\Data\spam.csv", encoding="latin-1")
+        r"{}/Data/spam.csv".format(os.getcwd()), encoding="latin-1")
     df.drop(['Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4'], axis=1, inplace=True)
     # Features and Labels
     df['label'] = df['v1'].map({'ham': 0, 'spam': 1})
@@ -35,27 +38,34 @@ def predict():
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.33, random_state=42)
     # Naive Bayes Classifier
-    from sklearn.naive_bayes import MultinomialNB
     clf = MultinomialNB()
     clf.fit(X_train, y_train)
     clf.score(X_test, y_test)
 
     # XGboost
-    xgb = XGBRegressor(n_estimators=120, leanring_rate=0.075)
+    xgb = XGBClassifier()
     xgb.fit(X_train, y_train)
-    # Alternative Usage of Saved Model
-    # joblib.dump(clf, 'NB_spam_model.pkl')
-    # NB_spam_model = open('NB_spam_model.pkl','rb')
-    # clf = joblib.load(NB_spam_model)
+
+    neigh = KNeighborsClassifier(n_neighbors=3)
+    neigh.fit(X_train, y_train)
+
+    svm_predict = svm.SVC(decision_function_shape='ovo')
+    svm_predict.fit(X_train, y_train)
+
+    rf = RandomForestClassifier(n_estimators=100)
+    rf.fit(X_train, y_train)
+
+    dt = DecisionTreeClassifier(random_state=0)
+    dt.fit(X_train, y_train)
 
     if request.method == 'POST':
         message = request.form['message']
         data = [message]
         vect = cv.transform(data).toarray()
-        my_prediction = clf.predict(vect)
-        prediction = xgb.predict(vect)
-    return render_template('result.html', prediction=prediction)
+
+    return render_template('result.html', output={"message": data[0], "knn": neigh.predict(vect), "svm": svm_predict.predict(vect), "rf": rf.predict(vect), "dt": dt.predict(vect), "nb": clf.predict(vect)})
 
 
 if __name__ == '__main__':
+
     app.run(debug=True)
