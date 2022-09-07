@@ -1,15 +1,13 @@
-import pickle
 import os
-import joblib
 import pandas as pd
-from flask import Flask, render_template, request, url_for
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.naive_bayes import MultinomialNB
+from flask import Flask, render_template, request
 from sklearn import svm
-from xgboost import XGBClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
+from xgboost import XGBClassifier
 
 app = Flask(__name__)
 
@@ -45,25 +43,41 @@ def predict():
     # XGboost
     xgb = XGBClassifier()
     xgb.fit(X_train, y_train)
+    xgb.score(X_test, y_test)
 
-    neigh = KNeighborsClassifier(n_neighbors=3)
+    neigh = KNeighborsClassifier(n_neighbors=5)
     neigh.fit(X_train, y_train)
+    neigh.score(X_test, y_test)
 
-    svm_predict = svm.SVC(decision_function_shape='ovo')
+    svm_predict = svm.SVC(decision_function_shape='ovr')
     svm_predict.fit(X_train, y_train)
+    svm_predict.score(X_test, y_test)
 
     rf = RandomForestClassifier(n_estimators=100)
     rf.fit(X_train, y_train)
+    rf.score(X_test, y_test)
 
     dt = DecisionTreeClassifier(random_state=0)
     dt.fit(X_train, y_train)
+    dt.score(X_test, y_test)
 
     if request.method == 'POST':
         message = request.form['message']
         data = [message]
         vect = cv.transform(data).toarray()
 
-    return render_template('result.html', output={"message": data[0], "knn": neigh.predict(vect), "svm": svm_predict.predict(vect), "rf": rf.predict(vect), "dt": dt.predict(vect), "nb": clf.predict(vect)})
+        final_output = {
+            "message": data[0],
+            "knn": neigh.predict(vect),
+            "svm": svm_predict.predict(vect),
+            "rf": rf.predict(vect),
+            "dt": dt.predict(vect),
+            "nb": clf.predict(vect)
+        }
+
+        print(final_output)
+
+    return render_template('result.html', output=final_output)
 
 
 if __name__ == '__main__':
